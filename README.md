@@ -4,7 +4,7 @@ Generates a CSV of book listings from
 [Sellpy](https://www.sellpy.se) matching a curated list of authors.
 
 It queries Sellpy's public search index for each author listed in your
-search-terms file (`data/authors.json` by default, see Configuration), dedupes the results, and renders them into a
+search-terms file (`data/authors.json` by default), dedupes the results, and renders them into a
 CSV sorted by newest listing first. Each hit's `metadata` fields (title,
 ISBN, condition, book type, etc.) become their own columns.
 
