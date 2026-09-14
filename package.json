@@ -1,0 +1,16 @@
+{
+  "name": "shelfpy",
+  "version": "1.0.0",
+  "description": "Generates a CSV of Sellpy book listings matching a list of authors",
+  "type": "module",
+  "license": "MIT",
+  "private": true,
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "start": "node src/index.js",
+    "start:env": "node --env-file=.env src/index.js",
+    "creds": "node -e \"import('./src/sellpy.js').then(m=>m.resolveCredentials().then(console.log))\""
+  }
+}

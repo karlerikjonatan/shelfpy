@@ -1,0 +1,12 @@
+node_modules/
+.DS_Store
+.env
+
+# Generated output
+/books.csv
+
+# Ignore all local/generated JSON (search lists, caches, etc.) except the
+# ones npm itself needs tracked.
+*.json
+!package.json
+!package-lock.json
