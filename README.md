@@ -4,11 +4,9 @@ Generates a CSV of book listings from
 [Sellpy](https://www.sellpy.se) matching a curated list of authors.
 
 It queries Sellpy's public search index for each author listed in your
-search-terms file (`data/authors.json` by default — the name/path is yours
-to choose, see Configuration), dedupes the results, and renders them into a
+search-terms file (`data/authors.json` by default, see Configuration), dedupes the results, and renders them into a
 CSV sorted by newest listing first. Each hit's `metadata` fields (title,
-ISBN, condition, book type, etc.) become their own columns — no images are
-included.
+ISBN, condition, book type, etc.) become their own columns.
 
 ## Usage
 
@@ -16,8 +14,7 @@ included.
 npm start
 ```
 
-This writes a timestamped CSV to `output/`, e.g. `output/20260914_193045_books.csv`
-— each run creates a new file rather than overwriting the last one.
+This writes a timestamped CSV to `output/`, e.g. `output/20260914_193045_books.csv` — each run creates a new file.
 
 ## Configuration
 
