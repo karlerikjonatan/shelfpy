@@ -4,11 +4,11 @@ Generates a CSV of book listings from
 [Sellpy](https://www.sellpy.se) matching a curated list of authors.
 
 It queries Sellpy's public search index for each author listed in your
-search-terms file (`authors.json` by default — the name/path is yours to
-choose, see Configuration), dedupes the results, and renders them into a
-single `books.csv` file sorted by newest listing first. Each hit's
-`metadata` fields (title, ISBN, condition, book type, etc.) become their
-own columns — no images are included.
+search-terms file (`data/authors.json` by default — the name/path is yours
+to choose, see Configuration), dedupes the results, and renders them into a
+CSV sorted by newest listing first. Each hit's `metadata` fields (title,
+ISBN, condition, book type, etc.) become their own columns — no images are
+included.
 
 ## Usage
 
@@ -16,7 +16,8 @@ own columns — no images are included.
 npm start
 ```
 
-This writes `books.csv` in the project root.
+This writes a timestamped CSV to `output/`, e.g. `output/20260914_193045_books.csv`
+— each run creates a new file rather than overwriting the last one.
 
 ## Configuration
 
@@ -27,11 +28,13 @@ Copy [`.env.example`](.env.example) to `.env` and run `npm run start:env`
 | Variable | Default | Purpose |
 | --- | --- | --- |
 | `SELLPY_LOCALE` | `sv` | 2-letter Sellpy locale to search (`sv`=Sweden, `en`=international, `de`=Germany, `fr`=France, ...) |
-| `AUTHORS_PATH` | `./authors.json` | Path to the JSON array of search terms — any filename/path works |
-| `OUT_PATH` | `./books.csv` | Where the resulting CSV is written |
+| `DATA_DIR` | `./data` | Folder holding your search-term list files |
+| `AUTHORS_PATH` | `$DATA_DIR/authors.json` | Path to the JSON array of search terms — any filename/path works |
+| `OUTPUT_DIR` | `./output` | Folder to write timestamped CSVs into |
 
-Whatever you name it, that file is a flat JSON array of strings, e.g.
-`["Stephen King", "Agatha Christie"]`.
+Whatever you name it, a search-terms file is a flat JSON array of strings,
+e.g. `["Author", "Author"]`. Keep as many side by side in
+`data/` as you like — see [`data/README.md`](data/README.md).
 
 ## How it works
 

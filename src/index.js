@@ -1,4 +1,4 @@
-import { readFile, writeFile } from 'node:fs/promises';
+import { readFile, writeFile, mkdir } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { dirname, join, resolve } from 'node:path';
@@ -8,14 +8,23 @@ import { resolveCredentials, queryAuthors } from './sellpy.js';
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 
 // Override any of these per fork/run without touching source, e.g.:
-//   SELLPY_LOCALE=en AUTHORS_PATH=./my-authors.json npm start
+//   SELLPY_LOCALE=en AUTHORS_PATH=./data/my-authors.json npm start
 const LOCALE = process.env.SELLPY_LOCALE || 'sv';
+const DATA_DIR = process.env.DATA_DIR
+  ? resolve(process.env.DATA_DIR)
+  : join(ROOT, 'data');
+const OUTPUT_DIR = process.env.OUTPUT_DIR
+  ? resolve(process.env.OUTPUT_DIR)
+  : join(ROOT, 'output');
 const AUTHORS_PATH = process.env.AUTHORS_PATH
   ? resolve(process.env.AUTHORS_PATH)
-  : join(ROOT, 'authors.json');
-const OUT_PATH = process.env.OUT_PATH
-  ? resolve(process.env.OUT_PATH)
-  : join(ROOT, 'books.csv');
+  : join(DATA_DIR, 'authors.json');
+
+function timestamp() {
+  const d = new Date();
+  const pad = (n) => String(n).padStart(2, '0');
+  return `${d.getFullYear()}${pad(d.getMonth() + 1)}${pad(d.getDate())}_${pad(d.getHours())}${pad(d.getMinutes())}${pad(d.getSeconds())}`;
+}
 
 const BATCH_SIZE = 50;
 const DELAY_MS = 200;
@@ -125,8 +134,10 @@ async function main() {
     (a, b) => (b.saleStartedAt ?? 0) - (a.saleStartedAt ?? 0),
   );
 
-  await writeFile(OUT_PATH, renderCsv(items));
-  console.log(`[sellpy] wrote ${OUT_PATH}`);
+  await mkdir(OUTPUT_DIR, { recursive: true });
+  const outPath = join(OUTPUT_DIR, `${timestamp()}_books.csv`);
+  await writeFile(outPath, renderCsv(items));
+  console.log(`[sellpy] wrote ${outPath}`);
 }
 
 main().catch((err) => {
