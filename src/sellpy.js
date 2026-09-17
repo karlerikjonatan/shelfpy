@@ -90,5 +90,6 @@ function normalizeHit(h) {
     priceSEK: Math.round(priceOre / 100),
     url: `https://www.sellpy.se/item/${h.objectID}`,
     saleStartedAt: h.saleStartedAt ?? null,
+    image: h.images?.[0] ?? null,
   };
 }

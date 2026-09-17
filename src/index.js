@@ -19,6 +19,14 @@ const OUTPUT_DIR = process.env.OUTPUT_DIR
 const AUTHORS_PATH = process.env.AUTHORS_PATH
   ? resolve(process.env.AUTHORS_PATH)
   : join(DATA_DIR, 'authors.json');
+const OUTPUT_FORMAT = (process.env.OUTPUT_FORMAT || 'csv').toLowerCase();
+if (!['csv', 'md'].includes(OUTPUT_FORMAT)) {
+  throw new Error(`invalid OUTPUT_FORMAT "${OUTPUT_FORMAT}" (expected "csv" or "md")`);
+}
+const MD_COLUMNS = Number(process.env.MD_COLUMNS || 4);
+if (!Number.isInteger(MD_COLUMNS) || MD_COLUMNS < 1) {
+  throw new Error(`invalid MD_COLUMNS "${process.env.MD_COLUMNS}" (expected a positive integer)`);
+}
 
 function timestamp() {
   const d = new Date();
@@ -100,6 +108,28 @@ function renderCsv(items) {
   return [header, ...rows].join('\n') + '\n';
 }
 
+function mdEscape(value) {
+  return String(value ?? '').replace(/\|/g, '\\|').replace(/\r?\n/g, ' ');
+}
+
+function renderMarkdownGallery(items, columns) {
+  const cells = items
+    .filter((item) => item.image)
+    .map((item) => {
+      const title = mdEscape(item.metadata.title);
+      const author = mdEscape(item.author);
+      const price = `${item.priceSEK} kr`;
+      return `[![](${item.image})](${item.url})<br>${title}<br>${author}<br>${price}`;
+    });
+
+  const header = `| ${Array(columns).fill('').join(' | ')} |`;
+  const divider = `| ${Array(columns).fill('---').join(' | ')} |`;
+  const rows = chunk(cells, columns).map(
+    (row) => `| ${Array.from({ length: columns }, (_, i) => row[i] ?? '').join(' | ')} |`,
+  );
+  return [header, divider, ...rows].join('\n') + '\n';
+}
+
 async function main() {
   const creds = await resolveCredentials(LOCALE);
   console.log(`[sellpy] using locale ${creds.locale}, app ${creds.appId}, index ${creds.index}`);
@@ -135,8 +165,10 @@ async function main() {
   );
 
   await mkdir(OUTPUT_DIR, { recursive: true });
-  const outPath = join(OUTPUT_DIR, `${timestamp()}_books.csv`);
-  await writeFile(outPath, renderCsv(items));
+  const outPath = join(OUTPUT_DIR, `${timestamp()}_books.${OUTPUT_FORMAT}`);
+  const rendered =
+    OUTPUT_FORMAT === 'md' ? renderMarkdownGallery(items, MD_COLUMNS) : renderCsv(items);
+  await writeFile(outPath, rendered);
   console.log(`[sellpy] wrote ${outPath}`);
 }
 
