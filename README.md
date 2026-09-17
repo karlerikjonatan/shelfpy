@@ -1,12 +1,14 @@
 # shelfpy
 
-Generates a CSV of book listings from
+Generates a CSV or Markdown image gallery of book listings from
 [Sellpy](https://www.sellpy.se) matching a curated list of authors.
 
 It queries Sellpy's public search index for each author listed in your
-search-terms file (`data/authors.json` by default), dedupes the results, and renders them into a
-CSV sorted by newest listing first. Each hit's `metadata` fields (title,
-ISBN, condition, book type, etc.) become their own columns.
+search-terms file (`data/authors.json` by default), dedupes the results, and renders them
+sorted by newest listing first — either as a CSV, with each hit's `metadata`
+fields (title, ISBN, condition, book type, etc.) as their own columns, or as a
+Markdown table (4 columns by default) of cover images (each linking to the
+item) with the title, author, and price underneath.
 
 ## Usage
 
@@ -14,7 +16,7 @@ ISBN, condition, book type, etc.) become their own columns.
 npm start
 ```
 
-This writes a timestamped CSV to `output/`, e.g. `output/20260914_193045_books.csv` — each run creates a new file.
+This writes a timestamped file to `output/`, e.g. `output/20260914_193045_books.csv` — each run creates a new file. Set `OUTPUT_FORMAT=md` to get a Markdown table of cover images (with title, author, and price underneath each, `MD_COLUMNS` wide) instead (see [Configuration](#configuration)).
 
 ## Configuration
 
@@ -27,7 +29,9 @@ Copy [`.env.example`](.env.example) to `.env` and run `npm run start:env`
 | `SELLPY_LOCALE` | `sv` | 2-letter Sellpy locale to search (`sv`=Sweden, `en`=international, `de`=Germany, `fr`=France, ...) |
 | `DATA_DIR` | `./data` | Folder holding your search-term list files |
 | `AUTHORS_PATH` | `$DATA_DIR/authors.json` | Path to the JSON array of search terms — any filename/path works |
-| `OUTPUT_DIR` | `./output` | Folder to write timestamped CSVs into |
+| `OUTPUT_DIR` | `./output` | Folder to write timestamped output files into |
+| `OUTPUT_FORMAT` | `csv` | Output format: `csv` (one column per metadata field) or `md` (a Markdown table of cover images linking to each item, with title, author, and price underneath) |
+| `MD_COLUMNS` | `4` | Number of columns in the Markdown gallery table (only used when `OUTPUT_FORMAT=md`) |
 
 Whatever you name it, a search-terms file is a flat JSON array of strings,
 e.g. `["Author", "Author"]`. Keep as many side by side in
@@ -45,10 +49,11 @@ falling back to stale values.
 
 `src/index.js` batches the search terms (50 per request) and queries them
 via Algolia's multi-query endpoint in one HTTP call per batch, merges and
-dedupes hits by listing ID, and renders the result as CSV — one column per
-key found in the hits' `metadata` objects, plus the matched search term,
-price, sale date, and item URL. A batch that fails is logged and skipped
-rather than aborting the whole run.
+dedupes hits by listing ID, and renders the result as either CSV — one column
+per key found in the hits' `metadata` objects, plus the matched search term,
+price, sale date, and item URL — or a Markdown gallery of cover images, title,
+author, and price, per `OUTPUT_FORMAT`. A batch that fails is logged and
+skipped rather than aborting the whole run.
 
 ## Requirements
 

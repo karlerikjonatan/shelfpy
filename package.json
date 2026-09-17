@@ -1,7 +1,7 @@
 {
   "name": "shelfpy",
   "version": "1.0.0",
-  "description": "Generates a CSV of book listings from Sellpy matching a curated list of authors.",
+  "description": "Generates a CSV or Markdown image gallery of book listings from Sellpy matching a curated list of authors.",
   "type": "module",
   "license": "MIT",
   "private": true,
