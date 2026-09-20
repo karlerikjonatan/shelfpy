@@ -27,6 +27,10 @@ const MD_COLUMNS = Number(process.env.MD_COLUMNS || 4);
 if (!Number.isInteger(MD_COLUMNS) || MD_COLUMNS < 1) {
   throw new Error(`invalid MD_COLUMNS "${process.env.MD_COLUMNS}" (expected a positive integer)`);
 }
+const LANGUAGES = (process.env.LANGUAGE || '')
+  .split(',')
+  .map((s) => s.trim().toLowerCase())
+  .filter(Boolean);
 
 function timestamp() {
   const d = new Date();
@@ -164,10 +168,21 @@ async function main() {
     (a, b) => (b.saleStartedAt ?? 0) - (a.saleStartedAt ?? 0),
   );
 
+  const filtered = LANGUAGES.length
+    ? items.filter((item) =>
+        LANGUAGES.includes(String(item.metadata.language ?? '').toLowerCase()),
+      )
+    : items;
+  if (LANGUAGES.length) {
+    console.log(
+      `[sellpy] language filter (${LANGUAGES.join(', ')}): kept ${filtered.length}/${items.length} listing(s)`,
+    );
+  }
+
   await mkdir(OUTPUT_DIR, { recursive: true });
   const outPath = join(OUTPUT_DIR, `${timestamp()}_books.${OUTPUT_FORMAT}`);
   const rendered =
-    OUTPUT_FORMAT === 'md' ? renderMarkdownGallery(items, MD_COLUMNS) : renderCsv(items);
+    OUTPUT_FORMAT === 'md' ? renderMarkdownGallery(filtered, MD_COLUMNS) : renderCsv(filtered);
   await writeFile(outPath, rendered);
   console.log(`[sellpy] wrote ${outPath}`);
 }

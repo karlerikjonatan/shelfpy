@@ -32,6 +32,7 @@ Copy [`.env.example`](.env.example) to `.env` and run `npm run start:env`
 | `OUTPUT_DIR` | `./output` | Folder to write timestamped output files into |
 | `OUTPUT_FORMAT` | `csv` | Output format: `csv` or `md` |
 | `MD_COLUMNS` | `4` | Number of columns in the Markdown table |
+| `LANGUAGE` | *(none — no filter)* | Comma-separated list of languages to keep, matched against each hit's `metadata.language` (case-insensitive). |
 
 Whatever you name it, a search-terms file is a flat JSON array of strings,
 e.g. `["Author", "Author"]`. Keep as many side by side in
