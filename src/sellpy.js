@@ -20,8 +20,10 @@ export async function resolveCredentials(locale = DEFAULT_LOCALE) {
 
   const html = await fetchText(SEARCH_PAGE);
 
-  const bundleMatch = html.match(/\/market\/index\.[A-Za-z0-9_-]+\.bundle\.js/);
-  if (!bundleMatch) throw new Error('could not locate index bundle in HTML');
+  const bundleMatch = html.match(
+    /\/market\/config\.prod\.[A-Za-z0-9_-]+\.bundle\.js/,
+  );
+  if (!bundleMatch) throw new Error('could not locate config bundle in HTML');
   const bundleUrl = new URL(bundleMatch[0], 'https://www.sellpy.se').href;
 
   const bundle = await fetchText(bundleUrl);
@@ -29,15 +31,15 @@ export async function resolveCredentials(locale = DEFAULT_LOCALE) {
   const localeMatch = bundle.match(new RegExp(`\\b${locale}:\\{([^}]*)\\}`));
   const localeConfig = localeMatch?.[1] ?? '';
 
-  const appId = localeConfig.match(/applicationId:"([A-Z0-9]+)"/)?.[1];
-  const apiKey = localeConfig.match(/searchKey:"([a-f0-9]+)"/)?.[1];
-  const index = localeConfig.match(
-    /marketItemIndexSaleStartDescending:"([^"]+)"/,
-  )?.[1];
+  const configValue = (key) =>
+    localeConfig.match(new RegExp(`${key}:(["'\\x60])([^"'\\x60]+)\\1`))?.[2];
+  const appId = configValue('applicationId');
+  const apiKey = configValue('searchKey');
+  const index = configValue('marketItemIndexSaleStartDescending');
 
   if (!appId || !apiKey || !index) {
     throw new Error(
-      `incomplete creds for locale "${locale}" (appId=${!!appId} apiKey=${!!apiKey} index=${!!index}) — does this locale exist on Sellpy?`,
+      `incomplete creds for locale "${locale}" (appId=${!!appId} apiKey=${!!apiKey} index=${!!index})`,
     );
   }
 
