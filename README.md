@@ -42,7 +42,8 @@ e.g. `["Author", "Author"]`. Keep as many side by side in
 
 No API keys or accounts are needed. `src/sellpy.js` resolves Algolia search
 credentials fresh on every run by scraping Sellpy's public search page and
-its JS bundle for the requested locale's application ID, search-only API
+its production config JS bundle (under `/market/` or `/market/cached/`)
+for the requested locale's application ID, search-only API
 key, and index name. These are the same public, search-only credentials
 Sellpy's own website uses client-side (not a private secret). If the site's
 markup changes and resolution fails, the run fails with an error rather than
@@ -59,3 +60,7 @@ skipped rather than aborting the whole run.
 ## Requirements
 
 - Node.js >= 20
+
+## Tests
+
+Run `npm test` for credential-resolution regression tests with mocked HTTP responses.

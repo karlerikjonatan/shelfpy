@@ -21,7 +21,7 @@ export async function resolveCredentials(locale = DEFAULT_LOCALE) {
   const html = await fetchText(SEARCH_PAGE);
 
   const bundleMatch = html.match(
-    /\/market\/config\.prod\.[A-Za-z0-9_-]+\.bundle\.js/,
+    /\/market\/(?:cached\/)?config\.prod\.[A-Za-z0-9_-]+\.bundle\.js/,
   );
   if (!bundleMatch) throw new Error('could not locate config bundle in HTML');
   const bundleUrl = new URL(bundleMatch[0], 'https://www.sellpy.se').href;
