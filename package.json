@@ -9,6 +9,7 @@
     "node": ">=20"
   },
   "scripts": {
+    "test": "node --test",
     "start": "node src/index.js",
     "start:env": "node --env-file=.env src/index.js",
     "creds": "node -e \"import('./src/sellpy.js').then(m=>m.resolveCredentials().then(console.log))\""
